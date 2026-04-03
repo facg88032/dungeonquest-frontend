@@ -1,11 +1,6 @@
 <template>
-  <div>
-    <h1>DungeonQuest</h1>
-  </div>
+  <RouterView />
 </template>
 
 <script setup>
 </script>
-
-<style>
-</style>
