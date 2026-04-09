@@ -1,31 +1,36 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
-import { getPlayer } from '../api/player.js'
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { getPlayer, getHeroesByPlayerId } from '../api/player.js'
 
 export const usePlayerStore = defineStore('player', () => {
-  const player = ref(null)
-  const loading = ref(false)   // 控制載入中狀態
-  const error = ref(null)      // 記錄錯誤訊息
 
-  async function fetchPlayer(playerId) {
+  const player = ref(null)
+  const heroes = ref([])
+  const loading = ref(false)
+  const error = ref(null)
+
+  async function fetchAll(playerId) {
     loading.value = true
     error.value = null
     try {
-      const res = await getPlayer(playerId)
-      // 你後端回傳格式是 { success, message, data }
-      // 所以玩家資料在 res.data
-      player.value = res.data
+      // 同時發出兩個請求，等全部回來
+      const [playerRes, heroesRes] = await Promise.all([
+        getPlayer(playerId),
+        getHeroesByPlayerId(playerId)
+      ])
+      player.value = playerRes.data
+      heroes.value = heroesRes.data
     } catch (e) {
-      error.value = '載入玩家資料失敗'
+      error.value = '載入資料失敗'
     } finally {
-      // 不管成功或失敗，loading 都要關掉
       loading.value = false
     }
   }
 
-  function clearPlayer() {
+  function clearAll() {
     player.value = null
+    heroes.value = []
   }
 
-  return { player, loading, error, fetchPlayer, clearPlayer }
+  return { player, heroes, loading, error, fetchAll, clearAll }
 })
