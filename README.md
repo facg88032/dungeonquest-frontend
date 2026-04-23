@@ -1,5 +1,126 @@
-# Vue 3 + Vite
+# 🏰 DungeonQuest RPG（企業級技術實驗專案）
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+> **開發憲法**：地城暫態與大廳永久資產嚴格分離；核心業務遵循 AOP 審計與 MyBatis 數據驅動設計。
+> **專案目標**：內化 Java 21 特性，實作高可維護性的遊戲後端架構。
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+---
+
+## 🎮 1. 遊戲背景與資料模型 (Concept)
+
+在 **DungeonQuest** 的世界中，你將扮演一名 **地城指揮官**，肩負起復興冒險者大廳的重任。遊戲核心由「大廳經營」與「地城遠征」兩大體系構成：
+
+### 1.1🏛️ 冒險者大廳 (Lobby) — 永久的後盾
+大廳是您唯一的安全避風港。在這裡，您可以：
+* **招募與強化**：招募英雄並透過永久性的強化系統提升其基礎屬性，為更深層的探險做準備。
+* **繁榮度建設**：將地城帶回的戰利品轉化為大廳的繁榮度，解鎖更高階的技術與功能。
+
+### 1.2🌑 暫態地城 (Dungeon) — 未知的遠征
+踏出大廳，便是充滿隨機性與危險的暫態空間。每一次遠征都是一次全新的挑戰：
+
+### 一般模式
+- 入場選擇**難度**：Easy / Normal / Hard
+- 入場選擇**地圖主題**：森林 / 沙漠 / 熔岩（持續擴充）
+- 固定 **10 層**，全程維持同一地圖主題
+- 難度影響怪物強度與通關獎勵倍率
+- 每層事件（戰鬥 / 寶箱 / 天使 / 商人）依地圖主題的機率權重隨機生成
+- 最終層固定為 **BOSS 戰**
+
+### 挑戰者模式
+- 難度固定為 **Hard**
+- **無限挑戰**，每 10 層出現一個 BOSS
+- 每層地圖主題**隨機變化**，無法預測
+- 定位為熟練玩家的高難度無限挑戰
+
+### 1.3 核心循環 (Core Loop)
+**解鎖/強化永久英雄 (Lobby) → 選擇英雄進地城 → 隨機事件/戰鬥推進 → 結算結果 (Settlement) → 回大廳成長**
+
+### 1.4 數據模型設計
+- **Player**: 遊戲玩家， 擁有強化石，世界金幣材料。
+- **HeroTemplate**: 職業定義模板（戰士/法師/牧師），屬性固定。
+- **PlayerHero**: 玩家擁有的英雄， 可以強化英雄培養，提升初始化的屬性。
+- **DungeonHeroInstance**: 地城內 **暫態實體**，由 PlayerHero 複製生成，生命值與狀態隨機變動，以 **JSON 格式** 存於 `DungeonRun`，支援續玩。
+- **DungeonRun**: 單次挑戰進度紀錄（樓層、事件、英雄狀態、結果）。
+- **DungeonFloorTheme**: 各種類型地圖的模板
+- **待補**:
+---
+
+## 🏗️ 2. 技術棧藍圖 (Tech Stack)
+
+| 領域 | 技術組件 | 說明 |
+| :--- | :--- | :--- |
+| **後端核心** | Java 21 / Spring Boot 3 | 實作虛擬執行緒預留、現代化分層架構。 |
+| **持久層** | **JPA + MyBatis** | JPA 處理基礎 CRUD；MyBatis 處理複雜查詢、報表與大數據聚合。 |
+| **前端 WEB** | **Vue 3 / React** | 實作大廳英雄管理、地城冒險介面與戰鬥動態日誌。 |
+| **API 管理** | Swagger / OpenAPI 3.0 | 統一 API 文件與互動測試。 |
+| **橫切邏輯** | **Spring AOP** | 實作業界等級日誌監控（性能、診斷、審計）。 |
+| **安全性** | **JWT / RBAC** | 實現玩家登入驗證與後台權限管理。 |
+| **跨平台** | **Flutter** | 快速開發 Android/iOS 雙平台 App。 |
+| **自動化** | Postman / GitHub Actions | 流程預熱測試、CI/CD 部署。 |
+| **前瞻應用** | **AI 怪物行為控制** | 導入 AI 控制怪物決策邏輯。 |
+---
+
+## 🛡️ 3. 企業級技術實驗室 (Technical Lab)
+
+### 3.1 業界等級 AOP 日誌 (Logging Aspect)
+*實作 `@DungeonAudit` 切面，針對所有 Service 層進行以下監控：*
+- **效能追蹤 (StopWatch)**：記錄每個方法耗時（毫秒），監控戰鬥運算效率。
+- **MDC 診斷上下文**：在 Log 中自動注入 `runId` 與 `playerId`，實現一鍵篩選單次挑戰的所有日誌。
+- **行為審計**：記錄 `openTreasure`、`acceptAngel` 的入參（Input）與結果（Output），作為作弊偵測依據。
+
+
+
+### 3.2 MyBatis 數據分析報表 (Analytics)
+*透過 MyBatis 實作複雜 SQL，產出營運等級報表：*
+- **地城難度壓力分析**：統計各層樓的「玩家平均剩餘血量」與「死亡率」。
+- **經濟通膨審計**：計算全服金幣產出量 (Treasure) vs 消耗量 (Reinforce)。
+- **職業平衡直方圖**：統計各職業在不同層數的生存時長。
+
+---
+
+## 🗺️ 4. 完整功能開發路線圖 (Roadmap)
+
+### ✅ Phase A：地城核心骨架 (In Progress)
+- [x] 基礎資產表 (Player, Hero, Template) 建立與 JPA 審計。
+- [x] 地城挑戰啟動 (`startRun`) 與英雄狀態 JSON 初始化。
+- [x] 樓層推進邏輯 (`nextFloor`) 與隨機事件生成。
+- [ ] 挑整地城模板(DungeonTemplate)架構改成地城地圖模板(DungeonFloorTheme)用於每層地圖生城
+- [ ] 調整DungeonRun內容屬性跟解除DungeonTemplate綁定並且增加地圖模板相關
+
+### 🚧 Phase B：事件系統與 API 分離 (Pause)
+*目標：事件不直接在 nextFloor 處理，而是由專屬 API 驅動，避免邏輯肥大。*
+- [x] **TREASURE (寶箱)**：發放金幣與強化石 (Bug 已修正)。
+- [x] **ANGEL (天使)**：英雄狀態解析與百分比補血（目前為固定能力版）。
+- [ ] **BATTLE (戰鬥)**：一般怪戰鬥事件接入。
+- [ ] **MERCHANT (商人)**：資源交換、購買地城暫時性 Buff 系統。
+- [ ] **ELITE (精英)**：高難度精英怪事件觸發。
+- [ ] **BOSS (首領)**：地城最後層級大首領事件。
+- [ ] **事件消耗守門員**：實作強制機制，Event 必須為 `NONE` 才可執行 `nextFloor`。
+
+### ⚔️ Phase C：戰鬥引擎 (Core Gameplay)
+- [ ] **MonsterTemplate**：MyBatis 實作怪物屬性與掉落表複雜查詢。
+- [ ] **BattleEngine**：回合制演算法、傷害計算公式與狀態回寫。
+
+### 💰 Phase D：結算、金流與閉環
+- [x] **Settlement Service**：地城通關/失敗後，將獎勵匯總回寫 Player 資源。
+- [x] **金流串接**：實作虛擬金流/課金系統練習。
+
+### 🖥️ Phase E：前端 WEB 實作 (Vue 3 / React)
+- [ ] **大廳管理 UI**：英雄清單、強化數值預覽。
+- [ ] **地城探險 UI**：樓層進度、事件對話框。
+- [ ] **戰鬥監控視窗**：動態戰鬥 Log 與血條顯示。
+
+### 🛡️ Phase F：安全性與企業架構
+- [ ] **Security**：JWT 驗證、RBAC 權限控制。
+- [ ] **架構優化**：多模塊 (Multi-module) 拆解、多數據源應用。
+
+### 🚀 Phase G：跨平台、自動化與 AI 延伸
+- [ ] **AI 導入**：怪物行為自動化控制系統。
+- [ ] **Flutter**：開發跨平台快速行動 APP。
+- [ ] **雲端部署**：Docker Compose / K8s 分散式部署。
+---
+
+## 🧪 4. 非功能性必做任務 (Maintenance)
+1. **GitHub Project 管理**：建立專案背景、計畫與顆粒度實作任務。 (Completed)
+2. **Swagger 接入**：管理日益增多的 API 接口。(In Progress)
+3. **自動化測試 (Automation)**：針對「需前置狀態」的功能建立 Postman 腳本，手動調用多個 API 實現一鍵跳轉。
+4. **企業級日誌 (AOP)**：記錄方法耗時、MDC 診斷與審計日誌。

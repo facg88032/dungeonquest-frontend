@@ -15,6 +15,13 @@
         <p>💎 強化石：{{ playerStore.player.reinforceStone }}</p>
       </el-card>
 
+       <el-button
+        type="primary"
+        style="margin-bottom: 20px;"
+        @click="goToDungeonSelect">
+        ⚔️ 前往地城
+      </el-button>
+
       <!-- 英雄列表 -->
       <h2>⚔️ 英雄圖鑑</h2>
       <div style="display: flex; gap: 16px; flex-wrap: wrap">
@@ -55,9 +62,16 @@
 import { computed, onMounted } from "vue";
 import { usePlayerStore } from "../stores/player.js";
 import { useHeroTemplateStore } from "../stores/heroTemplate.js";
+import { useRouter } from 'vue-router'
 
 const playerStore = usePlayerStore();
 const templateStore = useHeroTemplateStore();
+console.log("templateStore",templateStore.templates)
+const router = useRouter()
+
+function goToDungeonSelect() {
+  router.push({ name: 'dungeonSelect' })
+}
 
 const heroDisplayList = computed(() => {
   const unlockedMap = new Map(playerStore.heroes.map((h) => [h.templateId, h]));
@@ -73,7 +87,7 @@ const heroDisplayList = computed(() => {
 // 這裡先把 playerId 寫死，之後做登入功能再改
 onMounted(async () => {
   await Promise.all([
-    playerStore.fetchAll("647c3377-9c00-1d7e-819c-000dc7d50000"),
+    playerStore.fetchAll("019aac2c-296b-7d45-8432-a51e9d1750f3"),
     templateStore.fetchTemplates()
   ]);
 
