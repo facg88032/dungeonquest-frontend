@@ -15,3 +15,4 @@ export const useDungeonStore = defineStore('dungeon', () =>{
 
     return { dungeonRun, setDungeonRun, clear }
 })
+

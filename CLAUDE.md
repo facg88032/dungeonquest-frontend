@@ -57,6 +57,7 @@ EASY / NORMAL / HARD
 - 不跳過任何步驟
 - 開放所有閱讀權限
 - 禁止所有寫入權限
+- 每次完成一個階段更新進度至claude.md
 
 
 
@@ -71,23 +72,31 @@ EASY / NORMAL / HARD
 - E-05：Axios 安裝與 API 基底封裝
 - E-06：玩家大廳頁面，串接 GET /players/{id}
 - E-07：英雄圖鑑，已解鎖/未解鎖狀態顯示
-
-### 進行中
 - E-08：地城選擇頁面（難度、地圖主題、串接 POST /dungeon/start）
-
-### 待完成
 - E-09：跳轉到地城進行頁面
 - E-10：地城進行頁面，顯示樓層、血量、當前事件
 - E-11：TREASURE 事件串接
 - E-12：ANGEL 事件串接
 - E-13：下一層按鈕串接
-- E-14：結算頁面
+- E-14：結算頁面（含 BOSS 戰鬥串接）
 - E-15：整合測試
 
+### 進行中
+（無）
+
+### 待完成
+（無）
+
+## 額外功能（Phase E 後補）
+- 英雄解鎖功能：大廳未解鎖卡片加解鎖按鈕，串接 POST /players/{playerId}/heroes/unlock
+
+## 尚未實作
+- BATTLE / ELITE / MERCHANT 事件（目前遇到時可按下一層跳過）
+- 英雄強化（API 已有：PUT /players/{playerId}/heroes/{heroId}/reinforce）
+- 登入功能（playerId 目前寫死）
+
 ## 當前任務
-E-08：建立地城選擇頁面
-- 難度選擇：EASY / NORMAL / HARD
-- 地圖主題下拉選單：串接 GET /floor-theme
-- CHALLENGER 模式不需要選地圖主題
-- 按下「出發」呼叫 POST /dungeon/start
-- 成功後跳轉到
+Phase E 全部完成。下一步方向待決定：
+- Phase F：補齊 BATTLE / ELITE / MERCHANT 事件
+- 英雄強化頁面
+- 登入功能
